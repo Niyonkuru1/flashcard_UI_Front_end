@@ -1,23 +1,19 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import PageOne from "./components/PageOne";
+
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="w-full">
+      <div className="w-[80%] mx-auto h-screen">
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<PageOne />} />
+            {/* <Route path="/update_card" element={<EditCardForm />} /> */}
+          </Routes>
+        </BrowserRouter>
+      </div>
     </div>
   );
 }
