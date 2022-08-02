@@ -1,7 +1,9 @@
 import React, { useState } from "react";
-import { gql, useLazyQuery } from "@apollo/client";
+import { gql, useLazyQuery, useQuery } from "@apollo/client";
 import Card from "./Card";
 import NewCardForm from "./NewCardForm";
+import NewSignUpForm from "./NewSignUpForm";
+import LoginForm from "./LoginForm";
 
 export const GET_ALL_BLOGS = gql`
   query getAllPaginated($skipping: Int!, $taking: Int!) {
@@ -17,65 +19,55 @@ export const GET_ALL_BLOGS = gql`
 
 const PageOne = () => {
   const [paginated, setPaginated] = useState(0);
-  const [getAllData, {error, data, loading }] =
-    useLazyQuery
+  const {error, data, loading } =
+    useQuery
     (GET_ALL_BLOGS,
     {
       variables: {
         skipping: paginated,
-        taking: 6,
+        taking: 8,
       },
     });
-  console.log(data?.allBlogs);
+  // console.log(data?.allBlogs);
   const [modal, setModal] = useState(false);
+  const [loginModal, setloginModal] = useState(false);
   return (
-    <div className="grid grid-cols-12 grid-rows-8 bg-slate-400 h-full w-full">
-      {modal && (
-        <NewCardForm setModal={setModal} GET_ALL_BLOGS={GET_ALL_BLOGS} />
-      )}
-      <div className="bg-red-300 col-span-full row-span-1">
-        <div className="h-full w-full flex justify-end">
+    <div className="grid grid-cols-12 grid-rows-8 h-full w-full">
+      {modal && <NewSignUpForm setModal={setModal} />}
+      {loginModal && <LoginForm setModal={setloginModal} />}
+      <div className="bg-gray-300 col-span-full row-span-1">
+        <div className="h-full w-full flex justify-evenly">
+          <div className="flex items-center font-extrabold text-4xl">WELCOME TO THE FLASH CARDS</div>
           <div className="flex w-[400px] justify-evenly items-center">
             <div
-              className="w-[120px] h-[40px] rounded-lg bg-green-300 flex items-center cursor-pointer justify-center text-xl"
+              className="w-[120px] h-[40px] rounded-lg bg-gray-400 hover:bg-gray-500 text-white flex items-center cursor-pointer justify-center text-xl"
               onClick={() => {
                 setModal(true);
               }}
             >
-              Create card
+              Sign Up
             </div>
-            <div className="w-[120px] h-[40px] rounded-lg bg-green-300 flex items-center justify-center text-xl">
-              Register
-            </div>
-            <div className="w-[120px] h-[40px] rounded-lg bg-green-300 flex items-center justify-center text-xl">
-              Login
+            <div
+              className="w-[120px] h-[40px] rounded-lg bg-gray-400 hover:bg-gray-500 text-white flex cursor-pointer items-center justify-center text-xl"
+              onClick={() => {
+                setloginModal(true);
+              }}
+            >
+              Log In
             </div>
           </div>
         </div>
       </div>
-      <div className="bg-blue-300 row-start-2 row-span-6 col-start-3 col-end-13 flex flex-wrap mx-auto">
-        {data &&
-          data.allBlogs &&
-          data.allBlogs.map((card) => {
-            return <Card card={card} />;
-          })}
+      <div className="row-start-2 row-span-6 col-start-2 col-end-13 flex flex-wrap">
+          {data &&
+            data.allBlogs &&
+            data.allBlogs.map((card, index) => {
+              return <Card card={card} notLoggedIn={true} key={index} />;
+            })}
       </div>
-      <div className="bg-gray-300 row-start-2 row-span-6 col-start-1 col-end-3 overflow-y-auto">
-        <div className="mb-3 font-semibold text-[16px] w-full ">Subject</div>
-        <div className="text-md mb-3">
-          <button
-            className="w-[120px] h-[40px] rounded-lg bg-green-300 flex items-center justify-center text-xl  cursor-pointer"
-            onClick={() => {
-              getAllData();
-            }}
-          >
-            Fetch All
-          </button>
-        </div>
-      </div>
-      <div className="bg-yellow-300 row-span-1 col-span-full flex justify-evenly items-center">
+      <div className="bg-gray-300 row-span-1 col-span-full flex justify-evenly items-center">
         <div
-          className="w-[120px] h-[40px] cursor-pointer rounded-lg bg-green-300 flex items-center justify-center text-xl"
+          className="w-fit p-5 h-[40px] cursor-pointer rounded-lg bg-gray-400 hover:bg-gray-500 text-white flex items-center justify-center text-xl"
           onClick={() => {
             setPaginated((prev) => {
               if (prev - 6 < 0) {
@@ -88,7 +80,7 @@ const PageOne = () => {
           PREVIOUS CARDS
         </div>
         <div
-          className="w-[120px] h-[40px] cursor-pointer rounded-lg bg-green-300 flex items-center justify-center text-xl"
+          className="w-fit p-5 h-[40px] cursor-pointer rounded-lg bg-gray-400 hover:bg-gray-500 text-white flex items-center justify-center text-xl"
           onClick={() => {
             setPaginated((prev) => {
               if (data && data?.allBlogs && data.allBlogs.length < 6) {

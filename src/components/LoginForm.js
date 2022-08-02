@@ -1,33 +1,32 @@
 import React, { useState } from "react";
 import { gql, useMutation } from "@apollo/client";
-import { GET_ALL_BLOGS } from "./PageOne";
-import { FETCH_ONE_SUBJECT } from "./SubjectDetails";
+import { useNavigate } from "react-router-dom";
+import { AUTH_TOKEN } from "../constants";
+import jwt_decode from "jwt-decode";
 
-const UPDATE_BLOGS = gql`
-  # mutation update_blog($question: String!, $answer: String!, $id: String!) {
-  #   update_blog(question: $question, answer: $answer) {
-  #     question
-  #     answer
-  #     id
-  #     subjectId
-  #   }
-  # }
-  mutation($updateBlogId: String!, $answer: String!, $question: String!) {
-  update_blog(id: $updateBlogId, answer: $answer, question: $question) {
-    answer
-    question
-    id
-    subjectId
+const LOGIN_USER = gql`
+  mutation login_user(
+    $email: String!
+    $password: String!
+  ) {
+    login_user(
+      email: $email
+      password: $password
+    ) {
+      token
+      user {
+        firstName
+        secondName
+      }
+    }
   }
-}
-
 `;
 
-const EditCardForm = ({ setModal, dataToUpdate }) => {
+const LoginForm = ({ setModal }) => {
+  let navigate = useNavigate();
   const [input, setInput] = useState({
-    question: dataToUpdate.question,
-    answer:dataToUpdate.answer,
-    id: dataToUpdate.id
+    email: "",
+    password: "",
   });
 
   const handleChange = (e) => {
@@ -36,61 +35,61 @@ const EditCardForm = ({ setModal, dataToUpdate }) => {
       [e.target.name]: e.target.value,
     });
   };
-  const [update_blog, { error, data, loading }] = useMutation(UPDATE_BLOGS, {
-    refetchQueries: [
-      { query: FETCH_ONE_SUBJECT },
-      { query: GET_ALL_BLOGS }, // DocumentNode object parsed with gql
-      "getAllPaginated",
-      "oneSubject", // Query name
-    ],
+  const [login_user] = useMutation(LOGIN_USER, {
+    variables: {
+      email: input.email,
+      password: input.password,
+    },
+    onCompleted: ({ login_user }) => {
+      localStorage.setItem(AUTH_TOKEN, login_user.token);
+      const userIdFetched = jwt_decode(localStorage.getItem(AUTH_TOKEN));
+      console.log(userIdFetched);
+      navigate(`user/${userIdFetched.userId}`);
+    },
+    onError: (errors) => {
+      console.log(errors[0].message);
+      navigate("/");
+    },
   });
+
   const handleClick = (event) => {
     event.preventDefault();
-    if (!input.question || !input.answer) return;
-    update_blog({
-      variables: {
-        question: input.question,
-        answer: input.answer,
-        updateBlogId: input.id,
-      },
-    });
-    setInput({
-      question: "",
-      answer: "",
-      id: ""
-    });
-    setModal(false);
+    if (!input.email || !input.password) return;
+    login_user();
   };
 
   return (
-    <div className="w-screen h-screen flex justify-center items-center absolute top-0 left-0 bg-black bg-opacity-50 ">
-      <div className="w-1/2 h-2/3 bg-white px-10 py-2 rounded-lg">
+    <div className="w-screen h-screen flex justify-center items-center absolute bg-black bg-opacity-50 ">
+      <div className="w-1/2 h-2/4 bg-white px-10 py-2 rounded-lg">
         <div className="mb-4 font-bold border-b-2 border-solid border-darkBluePhant w-full pt-2">
-          Edit Card
+          Login into Account
         </div>
         <form className="w-full">
-          <div className="mb-6">
+          <div className="mb-2">
             <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-              Question
+              Email
             </label>
-            <textarea
+            <input
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              placeholder="What is react ?"
+              placeholder="Email "
+              type="email"
               onChange={handleChange}
-              name="question"
-              value={input.question}
+              name="email"
+              value={input.email}
             />
           </div>
-          <div className="mb-6">
+
+          <div className="mb-2">
             <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">
-              Answer
+              Password
             </label>
-            <textarea
-              onChange={handleChange}
-              name="answer"
-              value={input.answer}
+            <input
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              placeholder="React is UI frameword for .... ?"
+              placeholder="Password"
+              type="password"
+              onChange={handleChange}
+              name="password"
+              value={input.password}
             />
           </div>
 
@@ -100,13 +99,13 @@ const EditCardForm = ({ setModal, dataToUpdate }) => {
               type="submit"
               className=" w-[120px] h-[40px] rounded-lg bg-gray-400 hover:bg-gray-500 text-white flex items-center justify-center text-xl "
             >
-              Update card
+              Log In
             </button>
             <button
               onClick={(e) => {
                 setInput({
-                  question: "",
-                  answer: "",
+                  email: "",
+                  password: "",
                 });
                 setModal(false);
               }}
@@ -122,4 +121,4 @@ const EditCardForm = ({ setModal, dataToUpdate }) => {
   );
 };
 
-export default EditCardForm;
+export default LoginForm;

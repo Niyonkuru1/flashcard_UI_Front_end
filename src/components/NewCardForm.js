@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { gql, useMutation } from "@apollo/client";
-
+import { GET_ONE_USER } from "./PageTwo";
+import { FETCH_ONE_SUBJECT } from "./SubjectDetails";
+import { GET_ALL_BLOGS } from "./PageOne";
 const CREATE_BLOGS = gql`
-  mutation create_blog($question: String!, $answer: String!) {
-    create_blog(question: $question, answer: $answer) {
+  mutation create_blog($question: String!, $answer: String!, $subjectId: String!) {
+    create_blog(question: $question, answer: $answer, subjectId: $subjectId) {
       question
       answer
       id
@@ -12,10 +14,11 @@ const CREATE_BLOGS = gql`
   }
 `;
 
-const NewCardForm = ({ setModal, GET_ALL_BLOGS }) => {
+const NewCardForm = ({ setModal, subjectIdTopostOn }) => {
   const [input, setInput] = useState({
     question: "",
     answer: "",
+    subjectId: subjectIdTopostOn
   });
 
   const handleChange = (e) => {
@@ -26,8 +29,12 @@ const NewCardForm = ({ setModal, GET_ALL_BLOGS }) => {
   };
   const [create_blog, { error, data, loading }] = useMutation(CREATE_BLOGS, {
     refetchQueries: [
+      { query: GET_ONE_USER },
+      { query: FETCH_ONE_SUBJECT },
       { query: GET_ALL_BLOGS }, // DocumentNode object parsed with gql
-      "getAllPaginated", // Query name
+      "getAllPaginated",
+      "oneSubject", // DocumentNode object parsed with gql
+      "oneUser", // Query name
     ],
   });
   const handleClick = (event) => {
@@ -37,6 +44,7 @@ const NewCardForm = ({ setModal, GET_ALL_BLOGS }) => {
       variables: {
         question: input.question,
         answer: input.answer,
+        subjectId: input.subjectId,
       },
     });
 
@@ -46,10 +54,11 @@ const NewCardForm = ({ setModal, GET_ALL_BLOGS }) => {
       question: "",
       answer: "",
     });
+    setModal(false);
   };
 
   return (
-    <div className="w-screen h-screen flex justify-center items-center absolute bg-black bg-opacity-50 ">
+    <div className="w-screen h-screen flex justify-center items-center absolute top-0 left-0 bg-black bg-opacity-50 ">
       <div className="w-1/2 h-2/3 bg-white px-10 py-2 rounded-lg">
         <div className="mb-4 font-bold border-b-2 border-solid border-darkBluePhant w-full pt-2">
           Create Card
@@ -84,9 +93,9 @@ const NewCardForm = ({ setModal, GET_ALL_BLOGS }) => {
             <button
               onClick={handleClick}
               type="submit"
-              className=" w-[120px] h-[40px] rounded-lg bg-green-300 flex items-center justify-center text-xl "
+              className=" w-[120px] h-[40px] rounded-lg bg-gray-400 hover:bg-gray-500 text-white flex items-center justify-center text-xl "
             >
-              Submit
+              Create Card
             </button>
             <button
               onClick={(e) => {
@@ -97,7 +106,7 @@ const NewCardForm = ({ setModal, GET_ALL_BLOGS }) => {
                 setModal(false);
               }}
               type="submit"
-              className=" w-[120px] h-[40px] rounded-lg bg-green-300 flex items-center justify-center text-xl "
+              className=" w-[120px] h-[40px] rounded-lg bg-gray-400 hover:bg-gray-500 text-white flex items-center justify-center text-xl "
             >
               Back
             </button>
