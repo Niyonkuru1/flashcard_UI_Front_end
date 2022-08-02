@@ -1,6 +1,6 @@
 import { gql, useMutation } from "@apollo/client";
 import React, { useState } from "react";
-// import { GET_ALL_BLOGS } from "./PageOne";
+import CircleLoader from "react-spinners/ClipLoader";
 import { GET_ONE_USER } from "./PageTwo";
 
 const DELETE_SUBJECTS = gql`
@@ -36,6 +36,7 @@ const DeleteSubjectMessage = ({ setModal, idToDelete }) => {
         <div className="mb-4 font-bold border-b-2 border-solid border-darkBluePhant w-full pt-2">
           Create Card
         </div>
+        {loading ? ((<div className="w-screen h-screen flex justify-center items-center absolute top-0 left-0 bg-black bg-opacity-50"><CircleLoader speedMultiplier={1.5} loading={loading} size={200} className="text-center" /></div>)) : ("")}
         {data && data.delete_subject && (
           <div className="mb-4 font-bold border-b-2 border-solid border-darkBluePhant w-full pt-2">
             Status: {data.delete_subject}

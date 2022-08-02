@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import DeleteSubjectMessage from "./DeleteSubjectMessage";
+import CircleLoader from "react-spinners/ClipLoader";
 import NewCardForm from "./NewCardForm";
 import { useNavigate } from "react-router-dom";
 import { gql, useQuery } from "@apollo/client";
@@ -34,6 +35,8 @@ const Subjects = ({ subject, userId }) => {
           idToDelete={subject.id}
         />
       )}
+      {loading ? ((<div className="w-screen h-screen flex justify-center items-center absolute top-0 left-0 bg-black bg-opacity-50"><CircleLoader speedMultiplier={1.5} loading={loading} size={200} className="text-center" /></div>)) : ("")}
+
       <div className="w-[260px] ml-3  h-[200px] my-3">
         <div className="w-full h-full">
           <div className="h-[80%] w-full">

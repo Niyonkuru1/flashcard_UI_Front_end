@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import { gql, useMutation } from "@apollo/client";
-import { GET_ALL_SUBJECTS } from "./PageTwo";
-import { FETCH_ONE_SUBJECT } from "./SubjectDetails";
-import { GET_ALL_BLOGS } from "./PageOne";
+import CircleLoader from "react-spinners/ClipLoader";
 import { useNavigate } from "react-router-dom";
 import { AUTH_TOKEN } from "../constants";
 import jwt_decode from "jwt-decode";
@@ -44,7 +42,7 @@ const NewSignUpForm = ({ setModal }) => {
       [e.target.name]: e.target.value,
     });
   };
-  const [create_user] = useMutation(CREATE_USER, {
+  const [create_user, {loading}] = useMutation(CREATE_USER, {
     variables: {
       firstName: input.firstName,
       secondName: input.secondName,
@@ -75,6 +73,7 @@ const NewSignUpForm = ({ setModal }) => {
         <div className="mb-4 font-bold border-b-2 border-solid border-darkBluePhant w-full pt-2">
           Create Account
         </div>
+        {loading ? ((<div className="w-screen h-screen flex justify-center items-center absolute top-0 left-0 bg-black bg-opacity-50"><CircleLoader speedMultiplier={1.5} loading={loading} size={200} className="text-center" /></div>)) : ("")}
         <form className="w-full">
           <div className="mb-2">
             <label className="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">

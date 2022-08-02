@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { gql, useLazyQuery, useQuery } from "@apollo/client";
+import { gql, useQuery } from "@apollo/client";
+import CircleLoader from "react-spinners/ClipLoader";
 import Card from "./Card";
-import NewCardForm from "./NewCardForm";
 import NewSignUpForm from "./NewSignUpForm";
 import LoginForm from "./LoginForm";
 
@@ -19,16 +19,15 @@ export const GET_ALL_BLOGS = gql`
 
 const PageOne = () => {
   const [paginated, setPaginated] = useState(0);
-  const {error, data, loading } =
+  const { error, data, loading } =
     useQuery
-    (GET_ALL_BLOGS,
-    {
-      variables: {
-        skipping: paginated,
-        taking: 8,
-      },
-    });
-  // console.log(data?.allBlogs);
+      (GET_ALL_BLOGS,
+        {
+          variables: {
+            skipping: paginated,
+            taking: 8,
+          },
+        });
   const [modal, setModal] = useState(false);
   const [loginModal, setloginModal] = useState(false);
   return (
@@ -58,13 +57,15 @@ const PageOne = () => {
           </div>
         </div>
       </div>
-      <div className="row-start-2 row-span-6 col-start-2 col-end-13 flex flex-wrap">
-          {data &&
-            data.allBlogs &&
-            data.allBlogs.map((card, index) => {
-              return <Card card={card} notLoggedIn={true} key={index} />;
-            })}
-      </div>
+
+      {loading ? (<div className="w-screen h-screen flex justify-center items-center absolute top-0 left-0 bg-black bg-opacity-50"><CircleLoader speedMultiplier={1.5} loading={loading} size={200} className="text-center" /></div>) : (<div className="row-start-2 row-span-6 col-start-2 col-end-13 flex flex-wrap">
+        {data &&
+          data.allBlogs &&
+          data.allBlogs.map((card, index) => {
+            return <Card card={card} notLoggedIn={true} key={index} />;
+          })}
+      </div>)}
+
       <div className="bg-gray-300 row-span-1 col-span-full flex justify-evenly items-center">
         <div
           className="w-fit p-5 h-[40px] cursor-pointer rounded-lg bg-gray-400 hover:bg-gray-500 text-white flex items-center justify-center text-xl"
