@@ -1,8 +1,5 @@
 import React, { useState } from "react";
 import { gql, useMutation } from "@apollo/client";
-import { GET_ALL_SUBJECTS } from "./PageTwo";
-import { FETCH_ONE_SUBJECT } from "./SubjectDetails";
-import { GET_ALL_BLOGS } from "./PageOne";
 import { useNavigate } from "react-router-dom";
 import { AUTH_TOKEN } from "../constants";
 import jwt_decode from "jwt-decode";
